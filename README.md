@@ -1,6 +1,6 @@
 # openSourceSoftware
 
-Kookmin univ. Computer Science \n
+Kookmin univ. Computer Science
 Open Source Software class
 Final project
 Making webpage to make school time table.
