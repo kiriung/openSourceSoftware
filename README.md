@@ -1,5 +1,7 @@
 # openSourceSoftware
 
+team project for open source software
+
 Kookmin univ. Computer Science
 Open Source Software class
 Final project
@@ -10,3 +12,4 @@ Changheon Song
 Eun Namkung
 Hyeji Kim
 Kiyeon Kim
+
