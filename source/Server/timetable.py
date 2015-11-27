@@ -19,9 +19,7 @@ import webapp2
 import cgi
 
 MAIN_PAGE_HTML = """\
-
 <HTML>
-
 <HEAD>
     <META NAME="GENERATOR" Content="Microsoft Visual Studio" charset="utf-8">
     <TITLE></TITLE>
@@ -46,18 +44,16 @@ MAIN_PAGE_HTML = """\
         .choiceSubject {
             width: 100%;
             height: 600px;
-            border: 3px solid #747474;
-            background: #A6A6A6;
+            background: #EAEAEA;
         }
         .printTimeTable{
             width: 100%;
             height: 600px;
-            /*border: 5px solid black;*/
+            border: 5px solid black;
         }
         .choiceSubject table {
             width: 100%;
         }
-
         .choiceSubject td {
             border-bottom: 2px solid black;
         }
@@ -69,39 +65,47 @@ MAIN_PAGE_HTML = """\
     <div class="row" style="margin:20px">
         <div class="col-xs-4">
             <div class="choiceSubject">
-                <table>
-                    <tr>
-                        <td align="center">
-                            <input type="text" value="과목 검색" />
-                            <button type="button" class="btn btn-default btn-sm" onclick="printSubject()"> 검색 </button>
+                <table class="table table-bordered table-condensed">
+                    <tr align="center">
+                        <td class="center">
+                            <form class="navbar-form navbar-left" role="search">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="과목 검색">
+                                </div>
+                                <button type="button" class="btn btn-primary">검색</button>
+                            </form>
                         </td>
                     </tr>
                     <tr>
                         <td align="center">
-                            <input type="radio" name="grade" value="1" />1학년
-                            <input type="radio" name="grade" value="2" />2학년
-                            <input type="radio" name="grade" value="3" />3학년
-                            <input type="radio" name="grade" value="4" />4학년
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center">
-                            학과별 과목
-                            <select>
-                                <option value="선택하세요.">선택하세요</option>
-
+                            <select class="form-control">
+                                <option>학년별 과목</option>
+                                <option>1학년</option>
+                                <option>2학년</option>
+                                <option>3학년</option>
+                                <option>4학년</option>
                             </select>
-                            <br />
                         </td>
                     </tr>
                     <tr>
                         <td align="center">
-                            교양분류별 과목
-                            <select>
-                                <option value="선택하세요.">선택하세요</option>
-                                <option value="이산수학">영화듣기</option>
+                            <select class="form-control">
+                                <option>학과별 과목</option>
+                                <option>컴퓨터공학부</option>
                             </select>
-                            <br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <select class="form-control">
+                                <option>교양분류별 과목</option>
+                                <option>문학·언어</option>
+                                <option>역사·철학</option>
+                                <option>정치·경제·사회·세계</option>
+                                <option>과학·기술·자연</option>
+                                <option>예·체능계</option>
+                                <option>인성교육</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -111,7 +115,7 @@ MAIN_PAGE_HTML = """\
                     </tr>
                     <tr>
                         <td align="center">
-                            <input type="button" value="시간표 만들기" onclick="makeTimeTable()" />
+                            <input type="button" class="btn btn-primary btn-lg" value="시간표 만들기" onclick="makeTimeTable()" />
                     </tr>
 
                 </table>
@@ -119,24 +123,18 @@ MAIN_PAGE_HTML = """\
         </div>
         <div class="col-xs-8">
             <div class="printTimeTable">
-                <div id='calendar'>
-                </div>
+                <div id='calendar'></div>
             </div>
         </div>
     </div>
 
 
-     <script>
+    <script>
         function printSubject() {
-
         }
-
         function makeTimeTable() {
-
         }
-
         $(document).ready(function() {
-
             //코드가 data값이 있어야 정상적으로 작동을 하므로 아직 데이터가 없는 상황이어서 임의의 json형식의 데이터를 코드에 넣어줌
             //무의미 데이터
             var data = [
@@ -154,7 +152,6 @@ MAIN_PAGE_HTML = """\
                     title: 'Repeating Event',
                     start: '2015-02-09T16:00:00'
                 }];
-
             // page is now ready, initialize the calendar...
             // 수정이 더 필요한 부분 날짜는 보여지지 않아도 됨
             $('#calendar').fullCalendar(
@@ -178,14 +175,12 @@ MAIN_PAGE_HTML = """\
                         start: '00:00',
                         end: '24:00',
                         dow: [1,2,3,4,5]
-                    };
+                    },
                     events: data
                 }
             )
-
         });
     </script>
-
 </BODY>
 </HTML>
 """
@@ -196,7 +191,7 @@ class MainPage(webapp2.RequestHandler):
 
 class View_selected(webapp2.RequestHandler):
     def post(self):
-        self.response.write('<html><body>You wrote:<pre>')
+        self.response.write('<html><body> post response <pre>')
         self.response.write(cgi.escape(self.request.get('content')))
         self.response.write('</pre></body></html>')
 
