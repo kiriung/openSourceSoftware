@@ -15,185 +15,61 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import os
 import webapp2
+
+from google.appengine.ext import ndb
+
 import cgi
-
-MAIN_PAGE_HTML = """\
-<HTML>
-<HEAD>
-    <META NAME="GENERATOR" Content="Microsoft Visual Studio" charset="utf-8">
-    <TITLE></TITLE>
-
-    <!--필요한 라이브러리의 역할을 링크를 통하여 웹에서 가져오도록 함-->
-    <!--모든 기능이 필요한 것은 아니므로 min 정보로 가져온다-->
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.min.css' rel='stylesheet' />
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.print.css' rel='stylesheet' media='print' />
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js'></script>
-    <!--<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/ko.js'></script>-->
-
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.min.js'></script>
-
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/lang/ko.js'></script>
-
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css' rel='stylesheet' />
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js'></script>
+import jinja2
 
 
-    <style>
-        .choiceSubject {
-            width: 100%;
-            height: 600px;
-            background: #EAEAEA;
-        }
-        .printTimeTable{
-            width: 100%;
-            height: 600px;
-            border: 5px solid black;
-        }
-        .choiceSubject table {
-            width: 100%;
-        }
-        .choiceSubject td {
-            border-bottom: 2px solid black;
-        }
-
-    </style>
-</HEAD>
-
-<BODY>
-    <div class="row" style="margin:20px">
-        <div class="col-xs-4">
-            <div class="choiceSubject">
-                <table class="table table-bordered table-condensed">
-                    <tr align="center">
-                        <td class="center">
-                            <form class="navbar-form navbar-left" role="search">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="과목 검색">
-                                </div>
-                                <button type="button" class="btn btn-primary">검색</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center">
-                            <select class="form-control">
-                                <option>학년별 과목</option>
-                                <option>1학년</option>
-                                <option>2학년</option>
-                                <option>3학년</option>
-                                <option>4학년</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center">
-                            <select class="form-control">
-                                <option>학과별 과목</option>
-                                <option>컴퓨터공학부</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center">
-                            <select class="form-control">
-                                <option>교양분류별 과목</option>
-                                <option>문학·언어</option>
-                                <option>역사·철학</option>
-                                <option>정치·경제·사회·세계</option>
-                                <option>과학·기술·자연</option>
-                                <option>예·체능계</option>
-                                <option>인성교육</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="background:white;">
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center">
-                            <input type="button" class="btn btn-primary btn-lg" value="시간표 만들기" onclick="makeTimeTable()" />
-                    </tr>
-
-                </table>
-            </div>
-        </div>
-        <div class="col-xs-8">
-            <div class="printTimeTable">
-                <div id='calendar'></div>
-            </div>
-        </div>
-    </div>
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
-    <script>
-        function printSubject() {
-        }
-        function makeTimeTable() {
-        }
-        $(document).ready(function() {
-            //코드가 data값이 있어야 정상적으로 작동을 하므로 아직 데이터가 없는 상황이어서 임의의 json형식의 데이터를 코드에 넣어줌
-            //무의미 데이터
-            var data = [
-                {
-                    title: 'All Day Event',
-                    start: '2015-02-01'
-                },
-                {
-                    title: 'Long Event',
-                    start: '2015-02-07',
-                    end: '2015-02-10'
-                },
-                {
-                    id: 999,
-                    title: 'Repeating Event',
-                    start: '2015-02-09T16:00:00'
-                }];
-            // page is now ready, initialize the calendar...
-            // 수정이 더 필요한 부분 날짜는 보여지지 않아도 됨
-            $('#calendar').fullCalendar(
-                {
-                    header: {
-                        left: '',
-                        center: '',
-                        right: ''
-                    },
-                    timeFormat: 'H시(:mm)',
-                    columnFormat: 'ddd', //요일만 출력(시간표이기 때문에 날짜가 필요없음)
-                    axisFormat: 'a h시',
-                    allDaySlot: false,
-                    defaultView: 'agendaWeek',
-                    editable: false,
-                    minTime:'08:00:00',
-                    height: 'auto',
-                    maxTime:'20:00:00',
-                    lang:'ko',
-                    businessHours: {
-                        start: '00:00',
-                        end: '24:00',
-                        dow: [1,2,3,4,5]
-                    },
-                    events: data
-                }
-            )
-        });
-    </script>
-</BODY>
-</HTML>
-"""
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        self.response.write(MAIN_PAGE_HTML)
+
+        template_value ={
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_value))
 
 class View_selected(webapp2.RequestHandler):
     def post(self):
+
+        grade_option = self.request.get("control")
+
         self.response.write('<html><body> post response <pre>')
-        self.response.write(cgi.escape(self.request.get('content')))
+        input_string = self.request.get('input_subject')
+        self.response.write(ndb.get_context())
         self.response.write('</pre></body></html>')
+
+class classlist(ndb.Model):
+
+    subjectname = ndb.StringProperty(indexed=False)
+    classcode = ndb.StringProperty(indexed=False)
+    classnum = ndb.IntegerProperty(indexed=False)
+    ismajor = ndb.StringProperty(indexed=False)
+    classcredit = ndb.IntegerProperty(indexed=False)
+    professor = ndb.StringProperty(indexed=False)
+
+class Student(ndb.Model):
+
+    identity = ndb.StringProperty(indexed=False)
+    email = ndb.StringProperty(indexed=False)
+    personallist = ndb.StringProperty(indexed=False)
+
+
+class Greeting(ndb.Model):
+
+    student = ndb.StructuredProperty(Student)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
