@@ -26,6 +26,11 @@
             height: 600px;
             background: #EAEAEA;
         }
+        .printChoicedSubject {
+            width: 100%;
+            height: 600px;
+            background: #EAEAEA;
+        }
         .printTimeTable{
             width: 100%;
             height: 600px;
@@ -44,7 +49,7 @@
 
 <BODY>
     <div class="row" style="margin:20px">
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="choiceSubject">
                 <table class="table table-bordered table-condensed">
                     <tr align="center">
@@ -102,7 +107,20 @@
                 </table>
             </div>
         </div>
-        <div class="col-xs-8"> 
+        
+        <div class = "col-xs-3">
+            <div class = "printChoicedSubject">
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <td align = "center">
+                            선택된 과목
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="col-xs-6"> 
             <div class="printTimeTable">
                 <div id='calendar'></div>
             </div>
