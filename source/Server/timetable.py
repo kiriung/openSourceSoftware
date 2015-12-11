@@ -17,6 +17,7 @@
 #
 import os
 import webapp2
+import json
 
 from google.appengine.ext import ndb
 
@@ -29,7 +30,10 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+def getSubject(input_subjectname):
+    subject = ndb.Key('subjectname',input_subjectname)
 
+    return subject
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -43,20 +47,23 @@ class MainPage(webapp2.RequestHandler):
 class View_selected(webapp2.RequestHandler):
     def post(self):
 
-        grade_option = self.request.get("control")
+        #grade_option = self.request.get("control")
 
         self.response.write('<html><body> post response <pre>')
         input_string = self.request.get('input_subject')
-        self.response.write(ndb.get_context())
+        selected_Subject = getSubject(input_string)
+        self.response.write(selected_Subject)
         self.response.write('</pre></body></html>')
 
 class classlist(ndb.Model):
 
     subjectname = ndb.StringProperty(indexed=False)
+    grade = ndb.StringProperty(indexed=False)
+    time = ndb.StringProperty(indexed=False)
     classcode = ndb.StringProperty(indexed=False)
-    classnum = ndb.IntegerProperty(indexed=False)
+    classnum = ndb.StringProperty(indexed=False)
     ismajor = ndb.StringProperty(indexed=False)
-    classcredit = ndb.IntegerProperty(indexed=False)
+    classcredit = ndb.StringProperty(indexed=False)
     professor = ndb.StringProperty(indexed=False)
 
 class Student(ndb.Model):
