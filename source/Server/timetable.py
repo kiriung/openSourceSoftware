@@ -24,23 +24,55 @@ from google.appengine.ext import ndb
 import cgi
 import jinja2
 
-
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
-def getSubject(input_subjectname):
-    subject = ndb.Key('subjectname',input_subjectname)
 
-    return subject
+
+class Classlist(ndb.Model):
+    subjectname = ndb.StringProperty(indexed=True)
+    grade = ndb.StringProperty(indexed=True)
+    time = ndb.StringProperty(indexed=False)
+    classcode = ndb.StringProperty(indexed=True)
+    classnum = ndb.StringProperty(indexed=False)
+    ismajor = ndb.StringProperty(indexed=False)
+    classcredit = ndb.StringProperty(indexed=False)
+    professor = ndb.StringProperty(indexed=True)
+
+
+class Student(ndb.Model):
+
+    identity = ndb.StringProperty(indexed=False)
+    email = ndb.StringProperty(indexed=False)
+    personalclass = ndb.StringProperty(indexed=False)
+
+
+class Greeting(ndb.Model):
+
+    student = ndb.StructuredProperty(Student)
+
+
+
+def getSubject(input):
+
+    search_name = Classlist.query(Classlist.subjectname == input)   #Classlist에 원소가 없는것 처럼 보임
+    search_professor = Classlist.query(Classlist.professor == input)
+    search_code = Classlist.query(Classlist.classcode == input)
+
+    return search_name.fetch()
+
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
 
-        template_value ={
-        }
+        input_grade = self.request.get('selected_grade')
+        grade_qry = Classlist.query(Classlist.grade == input_grade).fetch()
+        template_value = {
+            'Classlist': grade_qry,
 
+        }
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_value))
 
@@ -50,35 +82,16 @@ class View_selected(webapp2.RequestHandler):
         #grade_option = self.request.get("control")
 
         self.response.write('<html><body> post response <pre>')
-        input_string = self.request.get('input_subject')
+        input_string = self.request.get('input_textbox')
+        self.response.write('searching data with ')
+        self.response.write(input_string+'</br>')
         selected_Subject = getSubject(input_string)
-        self.response.write(selected_Subject)
+        for i in range(0,len(selected_Subject)):
+            self.response.write(selected_Subject[i].subjectname +'</br>')
         self.response.write('</pre></body></html>')
-
-class classlist(ndb.Model):
-
-    subjectname = ndb.StringProperty(indexed=False)
-    grade = ndb.StringProperty(indexed=False)
-    time = ndb.StringProperty(indexed=False)
-    classcode = ndb.StringProperty(indexed=False)
-    classnum = ndb.StringProperty(indexed=False)
-    ismajor = ndb.StringProperty(indexed=False)
-    classcredit = ndb.StringProperty(indexed=False)
-    professor = ndb.StringProperty(indexed=False)
-
-class Student(ndb.Model):
-
-    identity = ndb.StringProperty(indexed=False)
-    email = ndb.StringProperty(indexed=False)
-    personallist = ndb.StringProperty(indexed=False)
-
-
-class Greeting(ndb.Model):
-
-    student = ndb.StructuredProperty(Student)
-
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/sign', View_selected),
+    ('/select',MainPage)
 ], debug=True)
