@@ -41,6 +41,22 @@ class Classlist(ndb.Model):
     classcredit = ndb.StringProperty(indexed=False)
     professor = ndb.StringProperty(indexed=True)
 
+def _todict(_Classlist):
+    dict_obj = {
+        'subjectname': _Classlist.subjectname,
+        'grade': _Classlist.grade,
+        'time': _Classlist.time,
+        'classcode': _Classlist.classcode,
+        'classnum': _Classlist.classnum,
+        'ismajor': _Classlist.ismajor,
+        'classcredit': _Classlist.classcredit,
+        'professor': _Classlist.professor
+    }
+
+    return dict_obj
+
+
+
 
 class Student(ndb.Model):
 
@@ -86,9 +102,16 @@ class View_selected(webapp2.RequestHandler):
         self.response.write('searching data with ')
         self.response.write(input_string+'</br>')
         selected_Subject = getSubject(input_string)
+        dict_selected_Subject = []
         for i in range(0,len(selected_Subject)):
-            self.response.write(selected_Subject[i].subjectname +'</br>')
+            dict_selected_Subject.append(_todict(selected_Subject[i]))
+            self.response.write(dict_selected_Subject[i])
+            self.response.write('</br>')
+        jsonlist = json.dumps(dict_selected_Subject,ensure_ascii=False)
+        self.response.write(jsonlist)
         self.response.write('</pre></body></html>')
+
+
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
