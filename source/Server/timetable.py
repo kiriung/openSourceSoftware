@@ -21,7 +21,6 @@ import json
 
 from google.appengine.ext import ndb
 
-import cgi
 import jinja2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -34,11 +33,11 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 class Classlist(ndb.Model):
     subjectname = ndb.StringProperty(indexed=True)
     grade = ndb.StringProperty(indexed=True)
-    time = ndb.StringProperty(indexed=False)
+    time = ndb.StringProperty(indexed=True)
     classcode = ndb.StringProperty(indexed=True)
-    classnum = ndb.StringProperty(indexed=False)
-    ismajor = ndb.StringProperty(indexed=False)
-    classcredit = ndb.StringProperty(indexed=False)
+    classnum = ndb.StringProperty(indexed=True)
+    ismajor = ndb.StringProperty(indexed=True)
+    classcredit = ndb.StringProperty(indexed=True)
     professor = ndb.StringProperty(indexed=True)
 
 def _todict(_Classlist):
@@ -79,42 +78,49 @@ def getSubject(input):
 
     return search_name.fetch()
 
+class Loaddata(webapp2.RequestHandler):
+    def get(self):
+        qry = Classlist.query().fetch()
+        for elem in qry:
+            self.response.write(json.dumps(_todict(elem)))
+
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
 
-        input_grade = self.request.get('selected_grade')
-        grade_qry = Classlist.query(Classlist.grade == input_grade).fetch()
         template_value = {
-            'Classlist': grade_qry,
-
         }
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_value))
 
-class View_selected(webapp2.RequestHandler):
+
+
+
+
+class View_searched(webapp2.RequestHandler):
     def post(self):
 
-        #grade_option = self.request.get("control")
-
-        self.response.write('<html><body> post response <pre>')
-        input_string = self.request.get('input_textbox')
-        self.response.write('searching data with ')
-        self.response.write(input_string+'</br>')
-        selected_Subject = getSubject(input_string)
+        input_string = self.request.get('input_textbox').encode('utf-8')
+        searched_Subject = Classlist.query(Classlist.subjectname == input_string or Classlist.professor == input_string or Classlist.classcredit == input_string ).fetch()
         dict_selected_Subject = []
-        for i in range(0,len(selected_Subject)):
-            dict_selected_Subject.append(_todict(selected_Subject[i]))
-            self.response.write(dict_selected_Subject[i])
-            self.response.write('</br>')
+        for i in range(0,len(searched_Subject)):
+            dict_selected_Subject.append(_todict(searched_Subject[i]))
         jsonlist = json.dumps(dict_selected_Subject,ensure_ascii=False)
         self.response.write(jsonlist)
-        self.response.write('</pre></body></html>')
 
+class View_selected(webapp2.RequestHandler):
+    def get(self):
+
+        template_value = {
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_value))
 
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/sign', View_selected),
-    ('/select',MainPage)
+    ('/selected', View_selected),
+    ('/searched',View_searched),
+    ('/load',Loaddata)
 ], debug=True)
