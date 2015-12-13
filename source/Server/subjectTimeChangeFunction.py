@@ -1,4 +1,4 @@
-
+# 시간표만들기를 눌렀을때만  계산하도록 만듬
 def changeTimeCharToInt(timedata):
     timedataList = timedata.split(",")
     timeIntVersion = [sumTimeInteager(timedataList[0])]
