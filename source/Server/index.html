@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
 {% autoescape true %}
 <HTML>
 <HEAD>
@@ -20,6 +21,7 @@
     <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css' rel='stylesheet' />
     <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js'></script>
 
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 
     <style>
         .choiceSubject {
@@ -55,11 +57,11 @@
                 <table class="table table-bordered table-condensed">
                     <tr align="center">
                         <td class="center">
-                            <form action="/searched" method="post" class="navbar-form navbar-left" role="search">
+                            <form method="post" onsubmit="return false" id="textbox_form" name="TextForm">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="input_textbox" placeholder="과목 검색">
+                                    <input type="text" class="form-control" id="textbox" name="input_textbox" placeholder="과목 검색">
                                 </div>
-                                <button type="submit" class="btn btn-primary">검색</button>
+                                <button type="button" class="btn btn-primary" id="btn_load">검색</button>
                             </form>
                         </td>
                     </tr>
@@ -106,7 +108,11 @@
                             검색 결과
                         </td>
                     </tr>
+
                 </table>
+                    <div id="data_container">
+                        <!-- 데이터컨테이너 -->
+                    </div>
             </div>
         </div>
 
@@ -124,7 +130,12 @@
                             <input type="button" class="btn btn-primary btn-lg" value="시간표 만들기" onclick="makeTimeTable()" />
                         </td>
                     </tr>
+                    <tr>
+                    </tr>
                 </table>
+                <div id="added_class">
+                        <!-- 추가된 과목들 -->
+                </div>
             </div>
         </div>
 
@@ -137,16 +148,15 @@
 
 
     <script>
-        function printSubject() {
-
-        }
 
         function makeTimeTable() {
 
         }
+        function printSubject(){
+
+        }
 
         $(document).ready(function() {
-
             //코드가 data값이 있어야 정상적으로 작동을 하므로 아직 데이터가 없는 상황이어서 임의의 json형식의 데이터를 코드에 넣어줌
             //무의미 데이터
             var data = [
@@ -164,7 +174,6 @@
                     title: 'Repeating Event',
                     start: '2015-02-09T16:00:00'
                 }];
-
             // page is now ready, initialize the calendar...
             // 수정이 더 필요한 부분 날짜는 보여지지 않아도 됨
             $('#calendar').fullCalendar(
@@ -195,6 +204,65 @@
 
         });
     </script>
+
+    <script>
+         var xmlHttp;
+        window.onload = function () {
+            $("#btn_load").click(function () {
+                startLoadFile();
+            });
+        }
+
+        function startLoadFile() {
+            a = $('#textbox_form').serialize();
+            //json 데이터 가져오기(비동기)
+            $.post("/searched",a,createList,"json")
+        }
+
+        var added_class;
+        //json 형식의 데이터 처리
+
+        function createList(objInfo) {
+
+            var objectDataAll = objInfo;
+            var strDOM = "";
+            for (var i = 0; i < objectDataAll.length; i++) {
+                //N번째 데이터 정보를 구한다.
+                var objectData = objectDataAll[i];
+
+                //N번째 데이터 패널 생성
+                strDOM += "<div id='" + objectData.classcode + "'> <button type='button' id='add_btn' onclick = 'button_click_add(this);'> + </button>";
+                strDOM += "<div><div>" + objectData.subjectname;
+                strDOM += "</div><div>" + objectData.classcode ;
+                strDOM += "<div>" + objectData.professor +"</div></div></div></div>";
+
+            }
+            // 데이터 컨테이너에 데이터 패널 추가한다.
+            var dataContainer = $("#data_container");
+            dataContainer.empty();
+            dataContainer.append(strDOM);
+
+        }
+
+        function button_click_add(elem){
+
+            var objectData = $(elem).parent();
+            var added_class = $("#added_class");
+            //if($("#added_class").children().find(objectData.attr("id")));
+            //else
+            added_class.append(objectData);
+
+        }
+
+        function loadSelectedFile() {
+            a = $('#added_class').serialize();
+            //json 데이터 가져오기(비동기)
+            $.post("/searched",a,createList,"json")
+        }
+
+
+    </script>
+
     <a href="{{ url|safe }}">{{ url_linktext }}</a>
 </BODY>
 </HTML>
