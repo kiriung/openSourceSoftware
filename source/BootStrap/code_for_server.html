@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+{% autoescape true %}
+<HTML>
+<HEAD>
+    <META NAME="GENERATOR" Content="Microsoft Visual Studio" charset="utf-8">
+    <TITLE></TITLE>
+
+    <!--필요한 라이브러리의 역할을 링크를 통하여 웹에서 가져오도록 함-->
+    <!--모든 기능이 필요한 것은 아니므로 min 정보로 가져온다-->
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.min.css' rel='stylesheet' />
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.print.css' rel='stylesheet' media='print' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js'></script>
+    <!--<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/ko.js'></script>-->
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.min.js'></script>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/lang/ko.js'></script>
+
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css' rel='stylesheet' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js'></script>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <style>
+        .choiceSubject {
+            width: 100%;
+            height: 600px;
+            background: #EAEAEA;
+        }
+        .printChoicedSubject {
+            width: 100%;
+            height: 600px;
+            background: #EAEAEA;
+        }
+        .printTimeTable{
+            width: 100%;
+            height: 600px;
+            border: 5px solid black;
+        }
+        .choiceSubject table {
+            width: 100%;
+        }
+        .choiceSubject td {
+            border-bottom: 2px solid black;
+        }
+    </style>
+</HEAD>
+
+<BODY>
+    <div class="row" style="margin:20px">
+        <div class="col-xs-3">
+            <div class="choiceSubject">
+                <table class="table table-bordered table-condensed">
+                    <tr align="center">
+                        <td class="center">
+                            <form method="post" onsubmit="return false" id="textbox_form" class="navbar-form navbar-left" name="TextForm">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="textbox" name="input_textbox" placeholder="과목 검색">
+                                </div>
+                                <button type="button" class="btn btn-primary" id="btn_load">검색</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr align="center">
+                        <td class="center">
+                            <form method="post" onsubmit="return false" id="textbox_form" class="form-horizontal" name="TextForm">
+                                <div class="selectGrade" class="row">
+                                    <div class="col-xs-9">
+                                        <select class="form-control">
+                                            <option>학년별 과목</option>
+                                            <option>1학년</option>
+                                            <option>2학년</option>
+                                            <option>3학년</option>
+                                            <option>4학년</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="btn_load">검색</button>
+                                </div>
+
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <form method="post" onsubmit="return false" id="textbox_form" class="form-horizontal" name="TextForm">
+                                <div class="selectGrade" class="row">
+                                    <div class="col-xs-9">
+                                        <select class="form-control">
+                                            <option>학과별 과목</option>
+                                            <option>컴퓨터공학부</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="btn_load">검색</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <form method="post" onsubmit="return false" id="textbox_form" class="form-horizontal" name="TextForm">
+                                <div class="selectGrade" class="row">
+                                    <div class="col-xs-9">
+                                        <select class="form-control">
+                                            <option>교양분류별 과목</option>
+                                            <option>문학·언어</option>
+                                            <option>역사·철학</option>
+                                            <option>정치·경제·사회·세계</option>
+                                            <option>과학·기술·자연</option>
+                                            <option>예·체능계</option>
+                                            <option>인성교육</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="btn_load">검색</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background:white;">
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align = "center" >
+                            검색 결과
+                        </td>
+                    </tr>
+
+                </table>
+                    <div id="data_container">
+                        <!-- 데이터컨테이너 -->
+                    </div>
+            </div>
+        </div>
+
+        <div class = "col-xs-3">
+            <div class = "printChoicedSubject">
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <td align = "center">
+                            선택된 과목
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">
+                            <input type="button" class="btn btn-primary btn-lg" value="시간표 만들기" onclick="makeTimeTable()" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-xs-6">
+            <div class="printTimeTable">
+                <div id='calendar'></div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function printSubject() {
+
+        }
+
+        function makeTimeTable() {
+
+        }
+
+        var xmlHttp;
+        window.onload = function () {
+            $("#btn_load").click(function () {
+                startLoadFile();
+            });
+        }
+
+        function startLoadFile() {
+            a = $('#textbox_form').serialize();
+            //json 데이터 가져오기(비동기)
+            $.post("/searched",a,createList,"json")
+        }
+
+        var a;
+        //json 형식의 데이터 처리
+        function createList(objInfo) {
+            console.log(objInfo);
+            var objectDataAll = objInfo;
+            var strDOM = "";
+            for (var i = 0; i < objectDataAll.length; i++) {
+                //N번째 데이터 정보를 구한다.
+                var objectData = objectDataAll[i];
+
+                //N번째 데이터 패널 생성
+
+                strDOM += "<div ><div ><span >+</span></div>"
+                strDOM += "<div ><div><div >" + objectData.subjectname;
+                strDOM += "</div><div>" + objectData.classcode ;
+                strDOM += "<div>" + objectData.professor +"</div></div></div></div></div>";
+
+            }
+            // 데이터 컨테이너에 데이터 패널 추가한다.
+            var dataContainer = $("#data_container");
+            dataContainer.empty();
+            dataContainer.append(strDOM);
+        }
+
+
+        $(document).ready(function() {
+
+            //코드가 data값이 있어야 정상적으로 작동을 하므로 아직 데이터가 없는 상황이어서 임의의 json형식의 데이터를 코드에 넣어줌
+            //무의미 데이터
+            var data = [
+                {
+                    title: 'All Day Event',
+                    start: '2015-02-01'
+                },
+                {
+                    title: 'Long Event',
+                    start: '2015-02-07',
+                    end: '2015-02-10'
+                },
+                {
+                    id: 999,
+                    title: 'Repeating Event',
+                    start: '2015-02-09T16:00:00'
+                }];
+
+            // page is now ready, initialize the calendar...
+            // 수정이 더 필요한 부분 날짜는 보여지지 않아도 됨
+            $('#calendar').fullCalendar(
+                {
+                    header: {
+                        left: '',
+                        center: '',
+                        right: ''
+                    },
+                    timeFormat: 'H시(:mm)',
+                    columnFormat: 'ddd', //요일만 출력(시간표이기 때문에 날짜가 필요없음)
+                    axisFormat: 'a h시',
+                    allDaySlot: false,
+                    defaultView: 'agendaWeek',
+                    editable: false,
+                    minTime:'08:00:00',
+                    height: 'auto',
+                    maxTime:'20:00:00',
+                    lang:'ko',
+                    businessHours: {
+                        start: '00:00',
+                        end: '24:00',
+                        dow: [1,2,3,4,5]
+                    },
+                    events: data
+                }
+            )
+
+        });
+    </script>
+    <a href="{{ url|safe }}">{{ url_linktext }}</a>
+</BODY>
+</HTML>
+{% endautoescape %}
