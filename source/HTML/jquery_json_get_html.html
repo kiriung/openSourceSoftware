@@ -1,0 +1,60 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.2.min.js">
+    </script>
+    <script>
+        var xmlHttp;
+        window.onload = function () {
+            $("#btn_load").click(function () {
+                startLoadFile();
+            });
+        }
+
+        function startLoadFile() {
+            //json 데이터 가져오기(비동기)
+            $.getJSON("data.json", null, this.createList);
+        }
+        var a;
+        //json 형식의 데이터 처리
+        function createList(objInfo) {
+            var objectDataAll = objInfo;
+            var strDOM = "";
+            for (var i = 0; i < objectDataAll.length; i++) {
+                //N번째 데이터 정보를 구한다.
+                var objectData = objectDataAll[i];
+
+                //N번째 데이터 패널 생성
+                strDOM += '<div class="data_panel">'
+                strDOM += '<p class="title">' + objectData.title + '</p>';
+                strDOM += '</div>';
+                strDOM += "과목명 :" + objectData.name + " ";
+                strDOM += "시간 :" + objectData.time + " ";
+                strDOM += "교수 :" + objectData.prof + "</br>";
+
+            }
+            // 데이터 컨테이너에 데이터 패널 추가한다.
+            var dataContainer = $("#data_container");
+            dataContainer.append(strDOM);
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <button id="btn_load">데이터검색</button>
+    </div>
+    <div id="data_container">
+        <!-- 뭔데이터를 넣으라는걸까 ㅅㅂ-->
+    </div>
+    <!-- 패널템플릿ㅋ-->
+    <div sytle="display:none;" id="data_panel_template">
+        <div class="data-panel">
+            <p class="title"></p>
+        </div>
+    </div>
+
+</body>
+</html>
